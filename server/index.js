@@ -7,8 +7,10 @@ import helmet from "helmet";
 import morgan from "morgan";
 import { MongoClient, ServerApiVersion } from "mongodb";
 import kpiRoutes from "./routes/kpi.js";
+import productRoutes from "./routes/product.js";
 import KPI from "./models/KPI.js";
-import { kpis } from "./data/data.js";
+import Product from "./models/Product.js";
+import { kpis, products } from "./data/data.js";
 
 /* Config */
 const app = express();
@@ -23,7 +25,7 @@ console.log("hello")
 
 /* Routes */
 app.use("/kpi", kpiRoutes);
-
+app.use("/product", productRoutes);
 
 
 /* mogoose */
@@ -38,5 +40,6 @@ mongoose.connect(uri, {
 
         /*await mongoose.connection.db.dropDatabase();
         KPI.insertMany(kpis);*/
+        /*Product.insertMany(products);*/
     })
     .catch((error) => console.error(`MongoDB Connection Error: ${error}`));
