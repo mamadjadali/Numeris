@@ -1,15 +1,38 @@
 import DashboardBox from "@/components/DashboardBox.tsx";
-import {Box, useTheme} from "@mui/material";
+import {Box, Typography, useTheme} from "@mui/material";
 import {useGetKpisQuery, useGetProductsQuery, useGetTransactionsQuery} from "@/state/api.ts";
 import BoxHeader from "@/components/BoxHeader.tsx";
 import {DataGrid, GridCellParams} from "@mui/x-data-grid";
+import {Cell, Pie, PieChart} from "recharts";
+import FlexBetween from "@/components/FlexBetween.tsx";
+import {useMemo} from "react";
 
 
 const Row3 = () => {
     const { palette } = useTheme();
+    const pieColors = [palette.primary[800], palette.primary[300]];
     const {data: kpiData} = useGetKpisQuery();
     const {data: productData} = useGetProductsQuery();
     const {data: transactionData} = useGetTransactionsQuery();
+    const pieChartData = useMemo(() => {
+        if (kpiData) {
+            const totalExpenses = kpiData[0].totalExpenses;
+            return Object.entries(kpiData[0].expensesByCategory).map(
+                ([key, value]) => {
+                    return [
+                        {
+                            name:key,
+                            value: value,
+                        },
+                        {
+                            name: `${key} of total`,
+                            value: totalExpenses - value,
+                        },
+                    ];
+                }
+            );
+        }
+    }, [kpiData]);
     const  productColumns = [
         {
             field: "_id",
@@ -122,8 +145,53 @@ const Row3 = () => {
                     />
                 </Box>
             </DashboardBox>
-            <DashboardBox gridArea="i"></DashboardBox>
-            <DashboardBox gridArea="j"></DashboardBox>
+            <DashboardBox gridArea="i">
+                <BoxHeader title="Expense By Category" sideText="+6%"/>
+                <FlexBetween mt="0.5rem" gap="0.5rem" p="0 1rem" textAlign="center">
+                    {pieChartData?.map((data,i) => (
+                        <Box key={`${data[0].name}-${i}`}>
+                            <PieChart width={110} height={100}>
+                                <Pie
+                                    stroke="none"
+                                    data={data}
+                                    innerRadius={18}
+                                    outerRadius={35}
+                                    paddingAngle={2}
+                                    dataKey="value"
+                                >
+                                    // @ts-ignore
+                                    {data.map((entry, index) => (
+                                        <Cell key={`cell-${index}`} fill={pieColors[index]} />
+                                    ))}
+                                </Pie>
+                            </PieChart>
+                            <Typography variant="h5">{data[0].name}</Typography>
+                        </Box>
+                    ))}
+                </FlexBetween>
+            </DashboardBox>
+            <DashboardBox gridArea="j">
+                <BoxHeader title="Overall Summery" sideText="+15%"/>
+                <Box
+                    height="15px"
+                    margin="1.25rem 1rem 0.4rem 1rem"
+                    bgcolor={palette.primary[800]}
+                    borderRadius="1rem"
+                >
+                    <Box
+                        height="15px"
+                        bgcolor={palette.primary[600]}
+                        borderRadius="1rem"
+                        width="40%"
+                    >
+
+                    </Box>
+                </Box>
+                <Typography margin="0 1rem" variant="h6">
+                    Quickly build your charts with decoupled, reusable React components.
+                    Built on top of SVG elements with a lightweight dependency on D3 submodules.
+                </Typography>
+            </DashboardBox>
         </>
     )
 }
