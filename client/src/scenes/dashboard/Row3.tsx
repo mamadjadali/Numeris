@@ -160,7 +160,7 @@ const Row3 = () => {
                                     dataKey="value"
                                 >
                                     // @ts-ignore
-                                    {data.map((entry, index) => (
+                                    {data.map((_entry, index) => (
                                         <Cell key={`cell-${index}`} fill={pieColors[index]} />
                                     ))}
                                 </Pie>
